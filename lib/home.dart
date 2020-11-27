@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'custom_camera.dart';
 
@@ -53,10 +54,17 @@ class CustomCameraButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      color: Theme.of(context).primaryColor,
-      textColor: Colors.white,
-      child: Text('Custom Camera'),
-      onPressed: () => customCameraResult(context),
-    );
+        color: Theme.of(context).primaryColor,
+        textColor: Colors.white,
+        child: Text('Custom Camera'),
+        onPressed: () async {
+          var status = await Permission.storage.request();
+
+          if (status.isGranted) {
+            customCameraResult(context);
+          } else {
+            return;
+          }
+        });
   }
 }

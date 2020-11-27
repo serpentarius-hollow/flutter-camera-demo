@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 enum CameraDevice {
   front,
@@ -76,11 +77,13 @@ class _CustomCameraState extends State<CustomCamera> {
       final newPath = await ExtStorage.getExternalStoragePublicDirectory(
         ExtStorage.DIRECTORY_DOWNLOADS,
       );
+      final fileName = p.basename(image.path);
 
-      image.copySync('$newPath/image-copy.jpg');
+      image.copySync('$newPath/$fileName');
 
       Directory(_imagePath).deleteSync(recursive: true);
-      Navigator.pop(context, newPath);
+
+      Navigator.pop(context, "$newPath/$fileName");
     } catch (err) {
       print(err);
     }
