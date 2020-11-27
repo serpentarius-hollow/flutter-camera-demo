@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum CameraDevice {
   front,
@@ -70,19 +72,25 @@ class _CustomCameraState extends State<CustomCamera> {
   }
 
   void _onOkButtonPressed() async {
-    try {
-      // TODO: copy the image file to download directory
-      final image = File(_imagePath);
-      final newPath = await ExtStorage.getExternalStoragePublicDirectory(
-        ExtStorage.DIRECTORY_DOWNLOADS,
-      );
+    final status = await Permission.storage.request();
 
-      image.copySync('$newPath/image-copy.jpg');
+    if (status.isGranted) {
+      try {
+        // copy the image file to device download directory
+        final image = File(_imagePath);
+        final newPath = await ExtStorage.getExternalStoragePublicDirectory(
+          ExtStorage.DIRECTORY_DOWNLOADS,
+        );
+        final fileName = p.basename(image.path);
 
-      Directory(_imagePath).deleteSync(recursive: true);
-      Navigator.pop(context, newPath);
-    } catch (err) {
-      print(err);
+        image.copySync('$newPath/$fileName');
+
+        Directory(_imagePath).deleteSync(recursive: true);
+
+        Navigator.pop(context, "$newPath/$fileName");
+      } catch (err) {
+        print(err);
+      }
     }
   }
 
@@ -239,12 +247,15 @@ class CameraResult extends StatelessWidget {
             ],
           ),
         ),
-        body: Image.file(
-          File(imagePath),
-          fit: BoxFit.cover,
-          height: double.infinity,
-          width: double.infinity,
-          alignment: Alignment.center,
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Image.file(
+            File(imagePath),
+            fit: BoxFit.contain,
+            height: double.infinity,
+            width: double.infinity,
+            alignment: Alignment.center,
+          ),
         ),
       ),
     );

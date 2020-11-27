@@ -41,7 +41,7 @@ class CustomCameraButton extends StatelessWidget {
           cameraDevice: CameraDevice.front,
         ),
       ),
-    );
+    ) as String;
 
     if (result != null) {
       Scaffold.of(context)
@@ -53,10 +53,11 @@ class CustomCameraButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      color: Theme.of(context).primaryColor,
-      textColor: Colors.white,
-      child: Text('Custom Camera'),
-      onPressed: () => customCameraResult(context),
-    );
+        color: Theme.of(context).primaryColor,
+        textColor: Colors.white,
+        child: Text('Custom Camera'),
+        onPressed: () async {
+          customCameraResult(context);
+        });
   }
 }
